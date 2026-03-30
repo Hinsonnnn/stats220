@@ -1,0 +1,110 @@
+---
+title: My dynamic report
+output: html_fragment
+---
+## Outdoor walk observations
+
+This report concluded the observations I recorded during my outdoor walks.
+The outcome is to identify things that I observed, such as weather conditions, time of day, and the number of people and dogs observed.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo=FALSE, message=FALSE, warning=FALSE, error=FALSE)
+
+library(tidyverse)
+
+logged_data <- read_csv("https://docs.google.com/spreadsheets/d/e/2PACX-1vTcQi7FNoJBQRqcxkFSAKP-6jipAojHFONwj8cPlt4xkTmpQSH7B1qs2rlcCoxjQVvSpAiiA6QU_voG/pub?output=csv")
+
+latest_data <- logged_data %>%
+  rename(
+    timestamp = Timestamp,
+    people_seen = `How many people did you see during your walk?`,
+    weather = `What was the weather like?`,
+    walk_time = `What time of day was your walk?`,
+    dogs_seen = `How many dogs did you see?`,
+    common_activity = `What was the most common activity you observed?`
+  ) %>%
+  mutate(
+    people_seen = as.numeric(people_seen),
+    dogs_seen = as.numeric(dogs_seen)
+  )
+
+```
+
+```{css}
+body {
+  font-family: Arial, sans-serif;
+  margin: 20px;
+  background-color: #f8fbfd;
+}
+
+h2 {
+  color: #1f4e79;
+}
+
+p {
+  font-size: 16px;
+}
+```
+
+## Summary
+
+```{r}
+mean_people <- mean(latest_data$people_seen, na.rm = TRUE)
+max_people <- max(latest_data$people_seen, na.rm = TRUE)
+mean_dogs <- mean(latest_data$dogs_seen, na.rm = TRUE)
+max_dogs <- max(latest_data$dogs_seen, na.rm = TRUE)
+```
+
+On average, I saw **`r round(mean_people, 1)` people** during each walk.
+
+The maximum number of people seen in one walk was **`r max_people`**.
+
+On average, I saw **`r round(mean_dogs, 1)` dogs** during each walk.
+
+The maximum number of dogs seen in one walk was **`r max_dogs`**.
+
+## Weather observations
+
+```{r}
+latest_data %>%
+  ggplot(aes(x = weather)) +
+  geom_bar(fill = "#8ecae6") +
+  labs(
+    title = "Weather observed during walks",
+    x = "Weather condition",
+    y = "Count"
+  )
+```
+
+This bar chart shows how often each weather condition occurred during my walks.
+
+## Time of day observations
+
+```{r}
+latest_data %>%
+  ggplot(aes(x = walk_time)) +
+  geom_bar(fill = "#ffb703") +
+  labs(
+    title = "Time of day of walks",
+    x = "Time of day",
+    y = "Count"
+  )
+```
+
+This bar chart shows when my walks were most commonly recorded.
+
+## Activities observed
+
+```{r}
+latest_data %>%
+  ggplot(aes(x = common_activity)) +
+  geom_bar(fill = "#90be6d") +
+  labs(
+    title = "Most common activity observed",
+    x = "Activity",
+    y = "Count"
+  )
+```
+
+![](https://c.tenor.com/-qBsG1HwR4oAAAAC/tenor.gif)
+
